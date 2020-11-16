@@ -1,0 +1,5 @@
+https://docs.python.org/3/library/socket.html
+https://wiki.python.org/moin/UdpCommunication#Using_UDP_for_e.g._File_Transfers
+https://squidarth.com/demonstrating-congestion-control.html
+http://stst.elia.pub.ro/news/RC/Teme_RC_IVA_2011_12/Lecu%20tica%20vidrascu%20442A%20Algoritmi%20de%20control%20al%20congestiei%20.pdf?fbclid=IwAR3OHA-q6KH6AmuWVXcxlsik7QOrazHCSRY8LxOyB7PI_EGtl720u2OKhO0
+http://stst.elia.pub.ro/news/RC/Teme_RC_IVA_2012_13/1_SoareBo_TCP%20CONTROLUL%20CONGESTIEI.pdf
