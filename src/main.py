@@ -22,11 +22,12 @@ def onStart():
 
 def onStop():
 	print("stop")
-	sender.stop()
 	receiver.stop()
+	sender.stop()
 
 def onCongestion():
-	print("cong")
+	receiver.is_congested(True)
+	print("congestion")
 
 def sendData():
 	print("send data")

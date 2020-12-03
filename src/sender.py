@@ -3,6 +3,7 @@ import time
 import sys
 import select
 import threading
+import packet
 
 
 class Sender:
@@ -32,7 +33,7 @@ class Sender:
     def send(self):
         while self.running:
             try:
-                self.socket.sendto(b'data', (self.d_ip, self.d_port))
+                self.socket.sendto(packet.next(8), (self.d_ip, self.d_port))
                 time.sleep(1)
             except:
                 print('Client closed the connection')
