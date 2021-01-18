@@ -25,13 +25,13 @@ def onStop():
 	receiver.stop()
 	sender.stop()
 
-def onCongestion():
+def startCongestion():
 	receiver.is_congested(True)
 	print("congestion")
 
-def sendData():
+def stopCongestion():
+	receiver.is_congested(False)
 	print("send data")
-
 
 
 class UIObjects:
@@ -41,8 +41,8 @@ class UIObjects:
 
 		self.startButton = Button(self.principal, text="Start connection", command=onStart, padx=40, pady=20, fg="blue", bg="white")
 		self.stopButton = Button(self.principal, text="Stop connection", command=onStop, padx=40, pady=20, fg="blue", bg="white")
-		self.congestionButton = Button(self.principal, text="Pierde pachete", command=onCongestion, padx=50, pady=10, fg="blue", bg="white")
-		self.sendButton = Button(self.principal, text="Trimite text", command=sendData, padx=50, pady=10, fg="blue", bg="white")
+		self.congestionButton = Button(self.principal, text="Pierde pachete", command=startCongestion, padx=50, pady=10, fg="blue", bg="white")
+		self.sendButton = Button(self.principal, text="Stop pierdere pachete", command=stopCongestion, padx=50, pady=10, fg="blue", bg="white")
 		self.server = Label(self.principal, text="Server")
 		self.client = Label(self.principal, text="Client")
 		self.messageToSend = Entry(self.principal, width=30, borderwidth=3)

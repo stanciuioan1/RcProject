@@ -4,6 +4,7 @@ import sys
 import select
 import threading
 import packet
+import bitcp
 
 
 class Sender:
@@ -17,6 +18,9 @@ class Sender:
         self.socket.bind((self.s_ip, self.s_port))
         self.running = False
         self.recv_package = False
+
+        self.cong_strategy = bitcp.BITCPStrategy(1, 64, 32, 256, 0.6)
+        self.ack_set = set()
 
     def start(self):
         self.send_thread = threading.Thread(target=self.send)
@@ -33,9 +37,12 @@ class Sender:
     def send(self):
         while self.running:
             try:
-                self.socket.sendto(packet.next(8), (self.d_ip, self.d_port))
+                # extrage cwnd pachete din fisier
+                packets, self.packet_ids = packet.next(8, int(self.cong_strategy.cwnd))
+                byte_array = packet.bundle(packets)
+                self.socket.sendto(byte_array, (self.d_ip, self.d_port))
                 time.sleep(1)
-            except:
+            except Exception as e:
                 print('Client closed the connection')
 
     def receive(self):
@@ -45,5 +52,10 @@ class Sender:
                 try:
                     data, address = self.socket.recvfrom(1024)
                     print("[SERVER]: S-a receptionat ", str(data), " de la ", address)
+                    packets = packet.parse(data)
+                    for pack in packets:
+                        self.packet_ids.remove(int(pack.get_id()))
+                    self.cong_strategy.update_strategy(self.packet_ids)
+                    print(self.cong_strategy)
                 except:
                     print('Client closed the connection')

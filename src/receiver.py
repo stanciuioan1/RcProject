@@ -4,6 +4,7 @@ import sys
 import select
 import threading
 import random
+import packet
 
 
 class Receiver:
@@ -38,10 +39,17 @@ class Receiver:
 
     def send_ack(self):
         while self.running:
-            if self.recv_packet and self.drop_packets and random.randint(0, 100) < 50:
-                self.recv_packet = False
-            elif self.recv_packet:
-                self.socket.sendto(bytes(f'{self.data.decode()}[ACK]', 'utf-8'), (self.d_ip, self.d_port))
+            if self.recv_packet:
+                recv_packets = packet.parse(self.data)
+                ack_packets = []
+                for pack in recv_packets:
+                    pack.update_data('ACK')
+                    if self.drop_packets and random.randint(0, 100) < 1:
+                        continue
+                    else:
+                        ack_packets.append(pack)
+
+                self.socket.sendto(packet.bundle(ack_packets), (self.d_ip, self.d_port))
                 self.recv_packet = False
 
     def receive(self):
