@@ -3,7 +3,12 @@ from tkinter import *
 import sender
 import receiver
 import configparser
+import bitcp
+import threading
+import time
 
+import stripchart as st
+import matplotlib.pyplot as plt
 
 cfgParser = configparser.RawConfigParser()
 cfgParser.read('com.cfg')
@@ -128,5 +133,26 @@ def main():
 	window = UIObjects()
 	window.startInterface()	
 
+gui_thread = threading.Thread(target=main)
+gui_thread.start()
 
-main()
+strategy = 0
+while not strategy:
+	try:
+		strategy = sender.cong_strategy
+	except:
+		print('Strategy not yet initialized')
+	time.sleep(0.5)
+
+x = []
+y = []
+while True:
+	plt.ion()
+	x.append(strategy.last)
+	y.append(strategy.cwnd)
+	plt.show(block=False)
+	plt.draw()
+	plt.plot(x, y, '-', color='blue')
+	plt.pause(0.1)
+	plt.ioff()
+	time.sleep(0.1)
