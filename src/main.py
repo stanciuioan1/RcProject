@@ -1,3 +1,4 @@
+from tkinter import filedialog
 from tkinter import *
 import sender
 import receiver
@@ -12,7 +13,7 @@ s_port = int(cfgParser.get('com-cfg', 's_port'))
 d_ip = cfgParser.get('com-cfg', 'd_ip')
 d_port = int(cfgParser.get('com-cfg', 'd_port'))
 
-
+input_path = "a"
 
 class UIObjects:
 	def updateObj(self):
@@ -30,6 +31,14 @@ class UIObjects:
 	def stopCongestion(self):
 		pass
 
+
+	def file_opener(self):
+		input_path = filedialog.askopenfile(initialdir="D")
+		input_path = input_path.name
+		print(input_path)
+	
+
+
 	def __init__(self):
 
 		
@@ -41,6 +50,7 @@ class UIObjects:
 		self.sendButton = Button(self.principal, text="Stop pierdere pachete", command=self.stopCongestion, padx=100, pady=10, fg="blue", bg="white")
 		self.server = Label(self.principal, text="Server")
 		self.client = Label(self.principal, text="Client")
+		self.rasfoire = Button(self.principal, text="Alege fisier", command=self.file_opener, padx=100, pady=10, fg="blue", bg="white")
 		#self.messageToSend = Entry(self.principal, width=30, borderwidth=3)
 		#self.messageToReceive = Entry(self.principal, width=30, borderwidth=3)
 		self.SliderProbability = Scale(self.principal, from_ = 0, to = 100, orient = HORIZONTAL)
@@ -66,6 +76,8 @@ class UIObjects:
 		self.PortSource.grid(row = 4, column=0)
 		self.PortDest.grid(row = 4, column=2)
 		self.updatePortButton.grid(row = 5, column=1)
+		self.rasfoire.grid(row = 6, column=0)
+
 
 		self.port_is_set = 0
 
@@ -79,7 +91,7 @@ class UIObjects:
 			port_source = self.SliderPortSource.get()
 			port_dest = self.SliderPortDest.get()
 			self.sender = sender.Sender(s_ip, port_source, d_ip, port_dest)
-			self.receiver = receiver.Receiver(d_ip, port_dest, s_ip, port_source)
+			self.receiver = receiver.Receiver(d_ip, port_dest, s_ip, port_source, input_path)
 			self.port_is_set = 1
 
 	def startInterface(self):
@@ -106,6 +118,9 @@ class UIObjects:
 		print("send data")
 
 
+
+def return_path():
+	return input_path
 
 
 def main():

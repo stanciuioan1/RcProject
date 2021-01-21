@@ -7,7 +7,7 @@ import packet
 
 
 class BITCPStrategy:
-    def __init__(self, cwnd: int, s_max: int, s_min: int, w_max: int, beta: int):
+    def __init__(self, cwnd: int, s_max: int, s_min: int, w_max: int, beta: float):
         self.cwnd = cwnd
         self.s_max = s_max
         self.s_min = s_min
