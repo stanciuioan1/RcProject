@@ -1,6 +1,6 @@
 from tkinter import filedialog
 from tkinter import *
-import sender
+import sender as snd
 import receiver
 import configparser
 import bitcp
@@ -20,34 +20,38 @@ d_port = int(cfgParser.get('com-cfg', 'd_port'))
 
 input_path = "a"
 
+sender = 0
+
 class UIObjects:
 	def updateObj(self):
 		pass
 
-	def onStart(self):
-		pass
+	# def onStart(self):
+	# 	pass
 
-	def onStop(self):
-		pass
+	# def onStop(self):
+	# 	pass
 
-	def startCongestion(self):
-		pass
+	# def startCongestion(self):
+	# 	pass
 
-	def stopCongestion(self):
-		pass
+	# def stopCongestion(self):
+	# 	pass
 
 
 	def file_opener(self):
-		input_path = filedialog.askopenfile(initialdir="D")
-		input_path = input_path.name
-		print(input_path)
-	
+		global sender
+		if sender:
+			input_path = filedialog.askopenfile(initialdir="D")
+			input_path = input_path.name
+			sender.set_file_path(input_path)
 
 
 	def __init__(self):
-
-		
 		self.principal = Tk()
+
+		self.sender = 0
+		self.receiver = 0
 
 		self.startButton = Button(self.principal, text="Start connection", command=self.onStart, padx=40, pady=20, fg="blue", bg="white")
 		self.stopButton = Button(self.principal, text="Stop connection", command=self.onStop, padx=40, pady=20, fg="blue", bg="white")
@@ -82,37 +86,38 @@ class UIObjects:
 		self.PortDest.grid(row = 4, column=2)
 		self.updatePortButton.grid(row = 5, column=1)
 		self.rasfoire.grid(row = 6, column=0)
-
-
 		self.port_is_set = 0
 
 	def updateProbabilitate(self):
-		
 		self.receiver.update_probability(self.SliderProbability.get())
 		print(self.SliderProbability.get())
 
 	def setPort(self):
+		global sender
 		if self.port_is_set == 0:
 			port_source = self.SliderPortSource.get()
 			port_dest = self.SliderPortDest.get()
-			self.sender = sender.Sender(s_ip, port_source, d_ip, port_dest)
-			self.receiver = receiver.Receiver(d_ip, port_dest, s_ip, port_source, input_path)
+			sender = snd.Sender(s_ip, port_source, d_ip, port_dest, input_path)
+			self.receiver = receiver.Receiver(d_ip, port_dest, s_ip, port_source)
 			self.port_is_set = 1
 
 	def startInterface(self):
+		global sender
 		self.principal.mainloop()
-		self.sender.stop()
+		sender.stop()
 		self.receiver.stop()
 
 	def onStart(self):
+		global sender
 		print("onStart")
-		self.sender.start()
+		sender.start()
 		self.receiver.start()
 
 	def onStop(self):
+		global sender
 		print("stop")
 		self.receiver.stop()
-		self.sender.stop()
+		sender.stop()
 
 	def startCongestion(self):
 		self.receiver.is_congested(True)
@@ -123,13 +128,11 @@ class UIObjects:
 		print("send data")
 
 
-
 def return_path():
 	return input_path
 
 
 def main():
-	
 	window = UIObjects()
 	window.startInterface()	
 

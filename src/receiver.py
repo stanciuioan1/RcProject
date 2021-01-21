@@ -49,7 +49,6 @@ class Receiver:
                 recv_packets = packet.parse(self.data)
                 ack_packets = []
                 for pack in recv_packets:
-                    pack.update_data('ACK')
                     if self.drop_packets and random.randint(0, 100) < self.probability:
                         continue
                     else:
@@ -71,7 +70,7 @@ class Receiver:
         binary_data = ''
         for data in self.file_data:
             binary_data += data.data
-        # print(binary_data)
+        print(binary_data)
         file_name, binary_data = binary_data.split('$FILENAME$')
 
         with open(file_name, 'wb') as file:

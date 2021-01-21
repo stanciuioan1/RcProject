@@ -4,7 +4,7 @@ import binascii as bn
 class File:
     def __init__(self, path: str):
         with open(path, 'rb') as stream:
-            file_name = path.split('\\')[-1]
+            file_name = path.split('/')[-1]
             self.data = bytes(f'{file_name}$FILENAME$', 'latin1') + stream.read()
         self.packets = []
         for i in range((len(self.data) + 7) // 8):

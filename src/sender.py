@@ -8,11 +8,12 @@ import bitcp
 
 
 class Sender:
-    def __init__(self, s_ip, s_port, d_ip, d_port):    
+    def __init__(self, s_ip, s_port, d_ip, d_port, file_path):    
         self.d_ip = d_ip
         self.d_port = d_port
         self.s_ip = s_ip
         self.s_port = s_port
+        self.file_path = file_path
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.socket.bind((self.s_ip, self.s_port))
@@ -22,7 +23,7 @@ class Sender:
 
     def start(self):
         self.cong_strategy = bitcp.BITCPStrategy(8, 1024, 512, 4096, 0.6)
-        tr_file = packet.File(R'C:\Users\Zeno\Downloads\flux-setup.exe')
+        tr_file = packet.File(self.file_path)
         self.packets = tr_file.packets
         self.packet_ptr = 0
         self.last_packet_flag = False
@@ -36,6 +37,9 @@ class Sender:
         self.running = False
         self.send_thread.join()
         self.recv_thread.join()
+
+    def set_file_path(self, path):
+        self.file_path = path
 
     def send(self):
         while self.running:
