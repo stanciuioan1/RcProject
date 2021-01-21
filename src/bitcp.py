@@ -5,7 +5,7 @@ import select
 import threading
 import packet
 
-import numpy as np
+#import numpy as np
 from matplotlib.lines import Line2D
 import matplotlib
 import matplotlib.pyplot as plt

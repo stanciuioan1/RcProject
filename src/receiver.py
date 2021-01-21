@@ -5,7 +5,7 @@ import select
 import threading
 import random
 import packet
-
+from tkinter import *
 
 class Receiver:
     def __init__(self, s_ip, s_port, d_ip, d_port):
@@ -23,11 +23,13 @@ class Receiver:
 
         self.drop_packets = False
         self.probability = 20
+        self.text_in_box = ""
 
-    def start(self):
+    def start(self, textbox):
         self.last_pack = 0
+        textbox.insert(END, "grane") 
         self.send_thread = threading.Thread(target=self.send_ack)
-        self.recv_thread = threading.Thread(target=self.receive)
+        self.recv_thread = threading.Thread(target=self.receive, args = (textbox, ))
         self.running = True
         self.send_thread.start()
         self.recv_thread.start()
@@ -77,11 +79,13 @@ class Receiver:
             file.write(bytes(binary_data, 'latin1'))
         print('Done writing data')
 
-    def receive(self):
+    def receive(self, textbox):
         while self.running:
             r, _, _ = select.select([self.socket], [], [], 1)
             if r:
                 self.data, address = self.socket.recvfrom(65536 * 1024)
+                self.text_in_box = "[CLIENT]: S-a receptionat "+ str(self.data)+ " de la "+ str(address) + '\n'
+                textbox.insert(END, self.text_in_box) 
                 # print("[CLIENT]: S-a receptionat ", str(self.data), " de la ", address)
                 self.recv_packet = True
             time.sleep(0.1)

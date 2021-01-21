@@ -5,7 +5,7 @@ import select
 import threading
 import packet
 import bitcp
-
+from tkinter import *
 
 class Sender:
     def __init__(self, s_ip, s_port, d_ip, d_port, file_path):    
@@ -20,15 +20,17 @@ class Sender:
         self.running = False
         self.recv_package = False
         self.packet_queue = []
+        self.input = input
+        self.text_in_box = ""
 
-    def start(self):
+    def start(self, textbox):
         self.cong_strategy = bitcp.BITCPStrategy(8, 1024, 512, 4096, 0.6)
         tr_file = packet.File(self.file_path)
         self.packets = tr_file.packets
         self.packet_ptr = 0
         self.last_packet_flag = False
         self.send_thread = threading.Thread(target=self.send)
-        self.recv_thread = threading.Thread(target=self.receive)
+        self.recv_thread = threading.Thread(target=self.receive, args = (textbox,))
         self.running = True
         self.send_thread.start()
         self.recv_thread.start()
@@ -63,14 +65,15 @@ class Sender:
             # except Exception as e:
             #     print('Client closed the connection')
 
-    def receive(self):
+    def receive(self, textbox):
         while self.running:
             r, _, _ = select.select([self.socket], [], [], 1)
             if r:
                 # try:
                 data, address = self.socket.recvfrom(65536 * 1024)
                 # print("[SERVER]: S-a receptionat ", str(data), " de la ", address)
-
+                self.text_in_box = "[SERVER]: S-a receptionat "+ str(data)+ " de la "+ str(address)+'\n'
+                textbox.insert(END, self.text_in_box) 
                 packets = packet.parse(data)
                 for pack in packets:
                     self.packet_ids.remove(int(pack.id))

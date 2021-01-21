@@ -26,18 +26,6 @@ class UIObjects:
 	def updateObj(self):
 		pass
 
-	# def onStart(self):
-	# 	pass
-
-	# def onStop(self):
-	# 	pass
-
-	# def startCongestion(self):
-	# 	pass
-
-	# def stopCongestion(self):
-	# 	pass
-
 
 	def file_opener(self):
 		global sender
@@ -60,8 +48,6 @@ class UIObjects:
 		self.server = Label(self.principal, text="Server")
 		self.client = Label(self.principal, text="Client")
 		self.rasfoire = Button(self.principal, text="Alege fisier", command=self.file_opener, padx=100, pady=10, fg="blue", bg="white")
-		#self.messageToSend = Entry(self.principal, width=30, borderwidth=3)
-		#self.messageToReceive = Entry(self.principal, width=30, borderwidth=3)
 		self.SliderProbability = Scale(self.principal, from_ = 0, to = 100, orient = HORIZONTAL)
 		self.SliderPortSource = Scale(self.principal, from_ = 5000, to = 5010, orient = HORIZONTAL)
 		self.SliderPortDest = Scale(self.principal, from_ = 5000, to = 5010, orient = HORIZONTAL)
@@ -69,13 +55,14 @@ class UIObjects:
 		self.updatePortButton = Button(self.principal, text="Seteaza Port", command=self.setPort, padx=100, pady=10, fg="blue", bg="white")
 		self.PortSource = Label(self.principal, text="Port sursa")
 		self.PortDest = Label(self.principal, text="Port destinatie")
+		self.textClient = Text(self.principal, height = 40, width = 50) 
+		self.textServer = Text(self.principal, height = 40, width = 50)
+
 
 		self.startButton.grid(row=1, column=0)
 		self.stopButton.grid(row=1, column=2)
 		self.server.grid(row=0, column=0)
 		self.client.grid(row=0, column=2)
-		#self.messageToSend.grid(row=2, column=0)
-		#self.messageToReceive.grid(row=2, column=2)
 		self.sendButton.grid(row=3, column=0)
 		self.SliderProbability.grid(row=3, column=1)
 		self.updateProbabilityButton.grid(row=2, column=1)
@@ -86,6 +73,11 @@ class UIObjects:
 		self.PortDest.grid(row = 4, column=2)
 		self.updatePortButton.grid(row = 5, column=1)
 		self.rasfoire.grid(row = 6, column=0)
+		self.textClient.grid(row = 7, column=0)
+		self.textServer.grid(row = 7, column=2)
+
+
+
 		self.port_is_set = 0
 
 	def updateProbabilitate(self):
@@ -110,8 +102,8 @@ class UIObjects:
 	def onStart(self):
 		global sender
 		print("onStart")
-		sender.start()
-		self.receiver.start()
+		sender.start(self.textServer)
+		self.receiver.start(self.textClient)
 
 	def onStop(self):
 		global sender
