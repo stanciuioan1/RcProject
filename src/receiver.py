@@ -22,6 +22,7 @@ class Receiver:
         self.file_data = []
 
         self.drop_packets = False
+        self.probability = 20
 
     def start(self):
         self.last_pack = 0
@@ -39,13 +40,17 @@ class Receiver:
     def is_congested(self, value):
         self.drop_packets = value
 
+    def update_probability(self, value):
+        self.probability = value
+
     def send_ack(self):
         while self.running:
             if self.recv_packet:
                 recv_packets = packet.parse(self.data)
                 ack_packets = []
                 for pack in recv_packets:
-                    if self.drop_packets and random.randint(0, 1000) < 1:
+                    pack.update_data('ACK')
+                    if self.drop_packets and random.randint(0, 100) < self.probability:
                         continue
                     else:
                         ack_packets.append(packet.Packet('ACK', pack.id))
