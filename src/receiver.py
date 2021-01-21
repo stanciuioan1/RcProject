@@ -19,10 +19,12 @@ class Receiver:
         self.running = False
         self.recv_packet = False
         self.data = b''
+        self.file_data = []
 
         self.drop_packets = False
 
     def start(self):
+        self.last_pack = 0
         self.send_thread = threading.Thread(target=self.send_ack)
         self.recv_thread = threading.Thread(target=self.receive)
         self.running = True
@@ -43,19 +45,39 @@ class Receiver:
                 recv_packets = packet.parse(self.data)
                 ack_packets = []
                 for pack in recv_packets:
-                    pack.update_data('ACK')
-                    if self.drop_packets and random.randint(0, 100) < 1:
+                    if self.drop_packets and random.randint(0, 1000) < 1:
                         continue
                     else:
-                        ack_packets.append(pack)
+                        ack_packets.append(packet.Packet('ACK', pack.id))
+                        self.last_pack = time.time()
+                        self.file_data.append(pack)
 
-                self.socket.sendto(packet.bundle(ack_packets), (self.d_ip, self.d_port))
+                byte_array, _ = packet.bundle(ack_packets)
+                self.socket.sendto(byte_array, (self.d_ip, self.d_port))
                 self.recv_packet = False
+            elif time.time() - self.last_pack > 10 and self.last_pack > 0:
+                self.running = False
+                self.write_data()
+            time.sleep(0.1)
+
+    def write_data(self):
+        print('Writing data')
+        self.file_data.sort(key=lambda x: x.id)
+        binary_data = ''
+        for data in self.file_data:
+            binary_data += data.data
+        # print(binary_data)
+        file_name, binary_data = binary_data.split('$FILENAME$')
+
+        with open(file_name, 'wb') as file:
+            file.write(bytes(binary_data, 'latin1'))
+        print('Done writing data')
 
     def receive(self):
         while self.running:
             r, _, _ = select.select([self.socket], [], [], 1)
             if r:
-                self.data, address = self.socket.recvfrom(1024)
-                print("[CLIENT]: S-a receptionat ", str(self.data), " de la ", address)
+                self.data, address = self.socket.recvfrom(65536 * 1024)
+                # print("[CLIENT]: S-a receptionat ", str(self.data), " de la ", address)
                 self.recv_packet = True
+            time.sleep(0.1)
