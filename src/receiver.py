@@ -21,6 +21,7 @@ class Receiver:
         self.data = b''
 
         self.drop_packets = False
+        self.probability = 20
 
     def start(self):
         self.send_thread = threading.Thread(target=self.send_ack)
@@ -37,6 +38,9 @@ class Receiver:
     def is_congested(self, value):
         self.drop_packets = value
 
+    def update_probability(self, value):
+        self.probability = value
+
     def send_ack(self):
         while self.running:
             if self.recv_packet:
@@ -44,7 +48,7 @@ class Receiver:
                 ack_packets = []
                 for pack in recv_packets:
                     pack.update_data('ACK')
-                    if self.drop_packets and random.randint(0, 100) < 1:
+                    if self.drop_packets and random.randint(0, 100) < self.probability:
                         continue
                     else:
                         ack_packets.append(pack)
