@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import stripchart as st
+#import stripchart as st
 
 
 class BITCPStrategy:

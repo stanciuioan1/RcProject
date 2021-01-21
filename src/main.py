@@ -7,7 +7,7 @@ import bitcp
 import threading
 import time
 
-import stripchart as st
+#import stripchart as st
 import matplotlib.pyplot as plt
 
 cfgParser = configparser.RawConfigParser()
