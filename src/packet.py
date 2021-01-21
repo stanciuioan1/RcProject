@@ -1,4 +1,3 @@
-#import numpy as np
 import binascii as bn
 
 class File:
@@ -13,19 +12,6 @@ class File:
         self.packets.append(Packet('$EOF$', (len(self.data) + 7) // 8 + 1))
 
 
-# def next(size: int, amount: int):
-#     global ptr
-#     packets = []
-#     packet_ids = set()
-#     while amount:
-#         ptr += 1
-#         packet_ids.add(ptr)
-#         packets.append(Packet(data[ptr*size:(ptr+1)*size], ptr))
-#         amount -= 1
-
-#     return packets, packet_ids
-
-
 def bundle(packets: list):
     return bytes('$PKDATA$'.join([str(x) for x in packets]), 'latin1'), set([x.id for x in packets])
 
@@ -36,13 +22,7 @@ def parse(byte_arr: bytes):
     if string:
         packets = [tuple(x.split('$PKID$')) for x in string.split('$PKDATA$')]
         packets = map(lambda x: Packet(str(x[0]), x[1]), packets)
-    return packets
-
-
-# def decode(byte_arr: bytes):
-#     string = bn.hexlify(byte_arr)
-#     data, p_id = string.split('$PKID$')
-#     return Packet(data, p_id)
+    return list(packets)
 
 
 class Packet:

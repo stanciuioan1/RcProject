@@ -27,7 +27,7 @@ class Receiver:
 
     def start(self, textbox):
         self.last_pack = 0
-        textbox.insert(END, "grane") 
+        self.textbox = textbox
         self.send_thread = threading.Thread(target=self.send_ack)
         self.recv_thread = threading.Thread(target=self.receive, args = (textbox, ))
         self.running = True
@@ -51,41 +51,39 @@ class Receiver:
                 recv_packets = packet.parse(self.data)
                 ack_packets = []
                 for pack in recv_packets:
-                    if self.drop_packets and random.randint(0, 100) < self.probability:
+                    if self.drop_packets and random.randint(0, 10000) < self.probability:
                         continue
                     else:
                         ack_packets.append(packet.Packet('ACK', pack.id))
                         self.last_pack = time.time()
                         self.file_data.append(pack)
 
+                self.text_in_box = f'S-au receptionat {len(ack_packets)} de la server\n'
+                self.textbox.insert(END, self.text_in_box) 
+                self.textbox.see('end')
+
                 byte_array, _ = packet.bundle(ack_packets)
                 self.socket.sendto(byte_array, (self.d_ip, self.d_port))
                 self.recv_packet = False
-            elif time.time() - self.last_pack > 10 and self.last_pack > 0:
+            elif time.time() - self.last_pack > 5 and self.last_pack > 0:
                 self.running = False
                 self.write_data()
             time.sleep(0.1)
 
     def write_data(self):
-        print('Writing data')
         self.file_data.sort(key=lambda x: x.id)
         binary_data = ''
         for data in self.file_data:
             binary_data += data.data
-        print(binary_data)
         file_name, binary_data = binary_data.split('$FILENAME$')
 
         with open(file_name, 'wb') as file:
             file.write(bytes(binary_data, 'latin1'))
-        print('Done writing data')
 
     def receive(self, textbox):
         while self.running:
             r, _, _ = select.select([self.socket], [], [], 1)
             if r:
                 self.data, address = self.socket.recvfrom(65536 * 1024)
-                self.text_in_box = "[CLIENT]: S-a receptionat "+ str(self.data)+ " de la "+ str(address) + '\n'
-                textbox.insert(END, self.text_in_box) 
-                # print("[CLIENT]: S-a receptionat ", str(self.data), " de la ", address)
                 self.recv_packet = True
             time.sleep(0.1)

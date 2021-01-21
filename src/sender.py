@@ -45,47 +45,44 @@ class Sender:
 
     def send(self):
         while self.running:
-            # try:
+            try:
+                while self.last_packet_flag is False and len(self.packet_queue) < int(self.cong_strategy.cwnd):
+                    if self.packets[self.packet_ptr].data == '$EOF$':
+                        self.last_packet_flag = True
+                    else:
+                        self.packet_queue.append(self.packets[self.packet_ptr])
+                        self.packet_ptr += 1
 
-            while self.last_packet_flag is False and len(self.packet_queue) < int(self.cong_strategy.cwnd):
-                if self.packets[self.packet_ptr].data == '$EOF$':
-                    self.last_packet_flag = True
-                else:
-                    self.packet_queue.append(self.packets[self.packet_ptr])
-                    self.packet_ptr += 1
-
-            if self.packet_queue:
-                byte_array, self.packet_ids = packet.bundle(self.packet_queue)
-                self.packet_queue.clear()
-                # print(byte_array)
-                self.socket.sendto(byte_array, (self.d_ip, self.d_port))
-            elif self.last_packet_flag:
-                self.running = False
-            time.sleep(1)
-            # except Exception as e:
-            #     print('Client closed the connection')
+                if self.packet_queue:
+                    byte_array, self.packet_ids = packet.bundle(self.packet_queue)
+                    self.packet_queue.clear()
+                    # print(byte_array)
+                    self.socket.sendto(byte_array, (self.d_ip, self.d_port))
+                elif self.last_packet_flag:
+                    self.running = False
+                time.sleep(1)
+            except Exception as e:
+                print(e.with_traceback())
 
     def receive(self, textbox):
         while self.running:
             r, _, _ = select.select([self.socket], [], [], 1)
             if r:
-                # try:
-                data, address = self.socket.recvfrom(65536 * 1024)
-                # print("[SERVER]: S-a receptionat ", str(data), " de la ", address)
-                self.text_in_box = "[SERVER]: S-a receptionat "+ str(data)+ " de la "+ str(address)+'\n'
-                textbox.insert(END, self.text_in_box) 
-                packets = packet.parse(data)
-                for pack in packets:
-                    self.packet_ids.remove(int(pack.id))
-                self.cong_strategy.update_strategy(self.packet_ids)
+                try:
+                    data, address = self.socket.recvfrom(65536 * 1024)
+                    packets = packet.parse(data)
+                    self.text_in_box = f'S-au receptionat {len(packets)} pachete de la client\n'
+                    textbox.insert(END, self.text_in_box) 
+                    for pack in packets:
+                        self.packet_ids.remove(int(pack.id))
+                    self.cong_strategy.update_strategy(self.packet_ids)
 
-                for i in self.packet_ids:
-                    self.packet_queue.append(self.packets[i])
-                # print('******************')
-                # print(self.packet_queue)
-                # print('******************')
-
-                print(self.cong_strategy)
-                # except:
-                #     print('Client closed the connection')
+                    if self.packet_ids:
+                        self.text_in_box = f'Lipsesc {len(self.packet_ids)} pachete!\n'
+                        textbox.insert(END, self.text_in_box)
+                    textbox.see('end')
+                    for i in self.packet_ids:
+                        self.packet_queue.append(self.packets[i])
+                except Exception as e:
+                    print(e.with_traceback())
             time.sleep(0.1)

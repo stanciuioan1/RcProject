@@ -7,7 +7,6 @@ import bitcp
 import threading
 import time
 
-#import stripchart as st
 import matplotlib.pyplot as plt
 
 cfgParser = configparser.RawConfigParser()
@@ -76,8 +75,6 @@ class UIObjects:
 		self.textClient.grid(row = 7, column=0)
 		self.textServer.grid(row = 7, column=2)
 
-
-
 		self.port_is_set = 0
 
 	def updateProbabilitate(self):
@@ -136,11 +133,14 @@ while not strategy:
 	try:
 		strategy = sender.cong_strategy
 	except:
-		print('Strategy not yet initialized')
+		pass
 	time.sleep(0.5)
 
 x = []
 y = []
+
+plt.ylabel('cwnd')
+plt.xlabel('rtt')
 while True:
 	plt.ion()
 	x.append(strategy.last)
