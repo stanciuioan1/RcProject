@@ -54,9 +54,28 @@ class UIObjects:
 		self.updatePortButton = Button(self.principal, text="Seteaza Port", command=self.setPort, padx=100, pady=10, fg="blue", bg="white")
 		self.PortSource = Label(self.principal, text="Port sursa")
 		self.PortDest = Label(self.principal, text="Port destinatie")
-		self.textClient = Text(self.principal, height = 40, width = 50) 
-		self.textServer = Text(self.principal, height = 40, width = 50)
+		self.textClient = Text(self.principal, height = 20, width = 50) 
+		self.textServer = Text(self.principal, height = 20, width = 50)
 
+		self.cwmd = Scale(self.principal, from_ = 0, to = 4096, orient = HORIZONTAL)
+		self.cwmd.set(8)
+		self.cwmd_l = Label(self.principal, text="Dimensiune fereastra congestie")
+
+		self.s_max = Scale(self.principal, from_ = 0, to = 4096, orient = HORIZONTAL)
+		self.s_max.set(1024)
+		self.s_max_l = Label(self.principal, text="Increment maxim")
+
+		self.s_min = Scale(self.principal, from_ = 0, to = 4096, orient = HORIZONTAL)
+		self.s_min.set(512)
+		self.s_min_l = Label(self.principal, text="Increment minim")
+
+		self.w_max = Scale(self.principal, from_ = 0, to = 4096, orient = HORIZONTAL)
+		self.w_max.set(4096)
+		self.w_max_l = Label(self.principal, text="Dimensiune maxima fereastra")
+
+		self.beta = Scale(self.principal, from_ = 0, to = 100, orient = HORIZONTAL)
+		self.beta.set(60)
+		self.beta_l = Label(self.principal, text="Factor de scadere multiplicativa(/100)")
 
 		self.startButton.grid(row=1, column=0)
 		self.stopButton.grid(row=1, column=2)
@@ -72,8 +91,20 @@ class UIObjects:
 		self.PortDest.grid(row = 4, column=2)
 		self.updatePortButton.grid(row = 5, column=1)
 		self.rasfoire.grid(row = 6, column=0)
-		self.textClient.grid(row = 7, column=0)
-		self.textServer.grid(row = 7, column=2)
+		self.textClient.grid(row = 16, column=0)
+		self.textServer.grid(row = 16, column=2)
+
+
+		self.cwmd_l.grid(row = 6, column=1)
+		self.cwmd.grid(row = 7, column=1)
+		self.s_max_l.grid(row = 8, column=1)
+		self.s_max.grid(row = 9, column=1)
+		self.s_min_l.grid(row = 10, column=1)
+		self.s_min.grid(row = 11, column=1)
+		self.w_max_l.grid(row = 12, column=1)
+		self.w_max.grid(row = 13, column=1)
+		self.beta_l.grid(row = 14, column=1)
+		self.beta.grid(row = 15, column=1)
 
 		self.port_is_set = 0
 
@@ -98,8 +129,13 @@ class UIObjects:
 
 	def onStart(self):
 		global sender
+		cwmd=self.cwmd.get()
+		smax=self.s_max.get()
+		smin=self.s_min.get()
+		wmax=self.w_max.get()
+		beta=self.beta.get()
 		print("onStart")
-		sender.start(self.textServer)
+		sender.start(self.textServer , cwmd, smax, smin, wmax, beta)
 		self.receiver.start(self.textClient)
 
 	def onStop(self):

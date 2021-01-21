@@ -23,8 +23,8 @@ class Sender:
         self.input = input
         self.text_in_box = ""
 
-    def start(self, textbox):
-        self.cong_strategy = bitcp.BITCPStrategy(8, 1024, 512, 4096, 0.6)
+    def start(self, textbox, cwmd, smax, smin, wmax, beta):
+        self.cong_strategy = bitcp.BITCPStrategy(cwmd, smax, smin, wmax, beta)
         tr_file = packet.File(self.file_path)
         self.packets = tr_file.packets
         self.packet_ptr = 0
